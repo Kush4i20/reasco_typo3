@@ -16,6 +16,8 @@ jobs:
   build-preview:
     name: Build static HTML preview
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
@@ -24,7 +26,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # ── Build a static preview from Fluid partials/templates ────────────
       # Since we have no full TYPO3 instance in CI, we generate a lightweight
@@ -225,6 +227,71 @@ jobs:
             fs.writeFileSync(outPath, full, 'utf8');
             console.log('Written:', outPath);
           }
+
+          const baseUrl = 'https://kush4i20.github.io/reasco_typo3';
+          const sitemapUrls = pages.map((p) => `${baseUrl}/${p.out.replace(/index\.html$/, '')}`);
+          const sitemapXml =
+            '<?xml version="1.0" encoding="UTF-8"?>\n' +
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+            sitemapUrls.map((u) => `  <url><loc>${u}</loc></url>`).join('\n') +
+            '\n</urlset>\n';
+          fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemapXml, 'utf8');
+
+          const robotsTxt = [
+            'User-agent: *',
+            'Allow: /',
+            `Sitemap: ${baseUrl}/sitemap.xml`,
+            ''
+          ].join('\n');
+          fs.writeFileSync(path.join(DIST, 'robots.txt'), robotsTxt, 'utf8');
+          EOF
+
+      - name: Validate generated HTML (SEO baseline)
+        run: |
+          node - <<'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const dist = 'dist';
+          const htmlFiles = [];
+
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(full);
+              else if (entry.name.endsWith('.html')) htmlFiles.push(full);
+            }
+          }
+
+          walk(dist);
+
+          const failures = [];
+
+          for (const file of htmlFiles) {
+            const src = fs.readFileSync(file, 'utf8');
+            const checks = [
+              ['<html lang="de-CH"', /<html[^>]*lang="de-CH"/i],
+              ['title tag', /<title>[^<]{8,}<\/title>/i],
+              ['meta description', /<meta[^>]*name="description"[^>]*content="[^"]{30,}"/i],
+              ['canonical link', /<link[^>]*rel="canonical"[^>]*href="https?:\/\//i],
+              ['og:title', /<meta[^>]*property="og:title"/i],
+              ['og:description', /<meta[^>]*property="og:description"/i],
+              ['single h1', (src.match(/<h1\b/gi) || []).length === 1],
+              ['json-ld script', /<script[^>]*type="application\/ld\+json"/i]
+            ];
+
+            for (const [label, test] of checks) {
+              const ok = typeof test === 'boolean' ? test : test.test(src);
+              if (!ok) failures.push(`${file}: missing/invalid ${label}`);
+            }
+          }
+
+          if (failures.length) {
+            console.error('SEO baseline validation failed:\n' + failures.join('\n'));
+            process.exit(1);
+          }
+
+          console.log(`Validated ${htmlFiles.length} HTML files.`);
           EOF
 
           # Add a small index for easier manual QA in GitHub Pages.
@@ -260,12 +327,9 @@ jobs:
       # ── Lint CSS ──────────────────────────────────────────────────────────
       - name: Check CSS syntax
         run: |
-          if command -v npx &>/dev/null; then
-            npx --yes stylelint \
-              "packages/reasco_site/Resources/Public/Css/styles.css" \
-              --config '{"rules":{"no-duplicate-selectors":true}}' \
-              || echo "stylelint warnings (non-blocking)"
-          fi
+          npx --yes stylelint \
+            "packages/reasco_site/Resources/Public/Css/styles.css" \
+            --config '{"rules":{"no-duplicate-selectors":true,"block-no-empty":true,"color-no-invalid-hex":true}}'
 
       # ── Upload pages artifact ─────────────────────────────────────────────
       - name: Upload Pages artifact

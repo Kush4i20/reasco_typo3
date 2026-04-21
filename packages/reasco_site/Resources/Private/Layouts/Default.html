@@ -9,25 +9,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {f:if(condition: '{page.title}', then: '<title>{page.title} | Reasco Immobilien AG</title>', else: '<title>Reasco Immobilien AG – Wir bringen Ihre Immobilie ans Ziel</title>')}
+    <f:if condition="{page.title}">
+        <f:then>
+            <title>{page.title} | Reasco Immobilien AG</title>
+        </f:then>
+        <f:else>
+            <title>Reasco Immobilien AG - Wir bringen Ihre Immobilie ans Ziel</title>
+        </f:else>
+    </f:if>
 
-    {f:if(condition: '{page.description}',
-        then: '<meta name="description" content="{page.description}">',
-        else: '<meta name="description" content="Reasco Immobilien AG – Bauherrenberatung, Architektur, Vermarktung und Energieberatung in der Region Schaffhausen.">'
-    )}
+    <f:if condition="{page.description}">
+        <f:then>
+            <meta name="description" content="{page.description}">
+        </f:then>
+        <f:else>
+            <meta name="description" content="Reasco Immobilien AG - Bauherrenberatung, Architektur, Vermarktung und Energieberatung in der Region Schaffhausen.">
+        </f:else>
+    </f:if>
 
-    {f:if(condition: '{page.no_index}', then: '<meta name="robots" content="noindex, nofollow">', else: '<meta name="robots" content="index, follow">')}
+    <f:if condition="{page.no_index}">
+        <f:then>
+            <meta name="robots" content="noindex, nofollow">
+        </f:then>
+        <f:else>
+            <meta name="robots" content="index, follow, max-image-preview:large">
+        </f:else>
+    </f:if>
 
-    <link rel="canonical" href="{f:uri.page(absolute: 1)}">
+    <link rel="canonical" href="{f:uri.page(pageUid: page.uid, absolute: 1)}">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_CH">
     <meta property="og:title" content="{page.title} | Reasco Immobilien AG">
     <meta property="og:description" content="{page.description -> f:format.htmlspecialchars()}">
-    <meta property="og:url" content="{f:uri.page(absolute: 1)}">
+    <meta property="og:url" content="{f:uri.page(pageUid: page.uid, absolute: 1)}">
     <meta property="og:site_name" content="Reasco Immobilien AG">
-    {f:if(condition: '{page.og_image}', then: '<meta property="og:image" content="{page.og_image}">')}
+
+    <f:if condition="{page.og_image}">
+        <meta property="og:image" content="{page.og_image}">
+    </f:if>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{page.title} | Reasco Immobilien AG">
+    <meta name="twitter:description" content="{page.description -> f:format.htmlspecialchars()}">
+    <f:if condition="{page.og_image}">
+        <meta name="twitter:image" content="{page.og_image}">
+    </f:if>
+
+    <!-- Basic geo/business hints -->
+    <meta name="geo.region" content="CH-SH">
+    <meta name="geo.placename" content="Neuhausen am Rheinfall">
+    <meta name="theme-color" content="#D0205A">
 
     <!-- JSON-LD Organization -->
     <script type="application/ld+json">
@@ -46,6 +80,16 @@
             "postalCode": "8212",
             "addressCountry": "CH"
         }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Reasco Immobilien AG",
+        "url": "https://reasco.immo",
+        "inLanguage": "de-CH"
     }
     </script>
 
