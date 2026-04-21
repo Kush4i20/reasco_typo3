@@ -40,12 +40,8 @@ jobs:
           cp packages/reasco_site/Resources/Public/Css/styles.css dist/assets/css/
           cp packages/reasco_site/Resources/Public/Js/scripts.js  dist/assets/js/
 
-          # Copy images (convert WebP/JPEG as-is; no processing needed for preview)
-          cp packages/reasco_site/Resources/Public/Images/*.svg   dist/assets/images/ 2>/dev/null || true
-          cp packages/reasco_site/Resources/Public/Images/*.webp  dist/assets/images/ 2>/dev/null || true
-          cp packages/reasco_site/Resources/Public/Images/*.jpg   dist/assets/images/ 2>/dev/null || true
-          cp packages/reasco_site/Resources/Public/Images/*.jpeg  dist/assets/images/ 2>/dev/null || true
-          cp packages/reasco_site/Resources/Public/Images/*.png   dist/assets/images/ 2>/dev/null || true
+          # Copy images recursively so nested folders (e.g. Images/live) are available in preview.
+          cp -R packages/reasco_site/Resources/Public/Images/. dist/assets/images/
 
           # Strip TYPO3-specific Fluid syntax (viewhelpers + comments) from
           # HTML partials so browsers can render a close approximation.
@@ -140,6 +136,38 @@ jobs:
                 return src ? inlinePartials(src, depth + 1) : '';
               }
             );
+          }
+
+          function injectFallbackNavigation(html, prefix, pageOut) {
+            const links = [
+              { out: 'index.html', label: 'Startseite' },
+              { out: 'bauherrenberatung/index.html', label: 'Bauherrenberatung' },
+              { out: 'architektur-bauleitung/index.html', label: 'Architektur & Bauleitung' },
+              { out: 'generalunternehmer-mandate/index.html', label: 'GU-Mandate' },
+              { out: 'vermarktung/index.html', label: 'Vermarktung' },
+              { out: 'energieberatung/index.html', label: 'Energieberatung' },
+              { out: 'ueber-uns/index.html', label: 'Über uns' },
+            ];
+
+            const desktop = links.map((l) => {
+              const isActive = l.out === pageOut;
+              const liClass = isActive ? 'site-nav__item site-nav__item--active' : 'site-nav__item';
+              const aClass = isActive ? 'site-nav__link site-nav__link--active' : 'site-nav__link';
+              const aria = isActive ? ' aria-current="page"' : '';
+              return `<li class="${liClass}"><a href="${prefix}${l.out}" class="${aClass}"${aria}>${l.label}</a></li>`;
+            }).join('');
+
+            const mobile = links.map((l) => {
+              const isActive = l.out === pageOut;
+              const aClass = isActive ? 'mobile-nav__link mobile-nav__link--active' : 'mobile-nav__link';
+              const aria = isActive ? ' aria-current="page"' : '';
+              return `<li class="mobile-nav__item"><a href="${prefix}${l.out}" class="${aClass}"${aria}>${l.label}</a></li>`;
+            }).join('');
+
+            return html
+              .replace(/<ul class="site-nav__links"[\s\S]*?<\/ul>/, `<ul class="site-nav__links" role="list">${desktop}</ul>`)
+              .replace(/<ul class="mobile-nav__links"[\s\S]*?<\/ul>/, `<ul class="mobile-nav__links" role="list">${mobile}</ul>`)
+              .replace(/<a href="#" class="site-nav__logo"/g, `<a href="${prefix}index.html" class="site-nav__logo"`);
           }
 
           const layoutSrc = fs.readFileSync(
@@ -238,6 +266,8 @@ jobs:
               .replace(/assets\/js\//g,     `${prefix}assets/js/`)
               .replace(/assets\/images\//g, `${prefix}assets/images/`)
               .replace(/href="\/"/g,        `href="${prefix}index.html"`);
+
+            full = injectFallbackNavigation(full, prefix, page.out);
 
             // Ensure absolute SEO URLs in preview output.
             full = full
