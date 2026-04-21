@@ -64,12 +64,33 @@ jobs:
               .replace(/\{page\.description\}/g, page.description || '');
           }
 
+          function resolveFluidIf(src, page) {
+            return src.replace(/<f:if\s+condition="([^"]+)">([\s\S]*?)<\/f:if>/g, (_, condition, body) => {
+              const thenMatch = body.match(/<f:then>([\s\S]*?)<\/f:then>/);
+              const elseMatch = body.match(/<f:else>([\s\S]*?)<\/f:else>/);
+              let isTrue = false;
+
+              if (/\{page\.title\}/.test(condition)) isTrue = !!(page.pageTitle || page.title);
+              else if (/\{page\.description\}/.test(condition)) isTrue = !!page.description;
+              else if (/\{page\.subtitle\}/.test(condition)) isTrue = !!page.subtitle;
+              else if (/\{page\.no_index\}/.test(condition)) isTrue = false;
+              else if (/\{page\.og_image\}/.test(condition)) isTrue = false;
+              else if (/^\!\{/.test(condition)) isTrue = false;
+
+              if (thenMatch || elseMatch) {
+                return isTrue ? (thenMatch ? thenMatch[1] : '') : (elseMatch ? elseMatch[1] : '');
+              }
+
+              return isTrue ? body : '';
+            });
+          }
+
           function stripFluid(src) {
             return src
               // Remove Fluid comments
               .replace(/<f:comment>[\s\S]*?<\/f:comment>/g, '')
-              // Resolve common f:if (keep inner content, drop tags)
-              .replace(/<f:if[^>]*>([\s\S]*?)<\/f:if>/g, '$1')
+              // Remove unsupported fluid structural tags that can leak into output
+              .replace(/<f:then>|<\/f:then>|<f:else>|<\/f:else>/g, '')
               // Remove remaining f:* tags (self-closing or paired)
               .replace(/<f:[^>]*\/>/g, '')
               .replace(/<\/?f:[^>]*>/g, '')
@@ -203,6 +224,7 @@ jobs:
 
             full = applyPageVars(full, page);
             full = inlinePartials(full);
+            full = resolveFluidIf(full, page);
             full = stripFluid(full);
 
             // Fix asset paths relative to nested pages
