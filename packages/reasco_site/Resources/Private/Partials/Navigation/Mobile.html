@@ -1,0 +1,30 @@
+<f:comment>Partial: Mobile Navigation Overlay</f:comment>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation" aria-hidden="true">
+    <div class="mobile-nav__inner">
+        <ul class="mobile-nav__links" role="list">
+            <f:for each="{mainNavigation}" as="item">
+                <li class="mobile-nav__item">
+                    <a href="{item.link}"
+                       class="mobile-nav__link{f:if(condition: item.active, then: ' mobile-nav__link--active')}"
+                       {f:if(condition: item.current, then: 'aria-current="page"')}>
+                        {item.title}
+                    </a>
+                    <f:if condition="{item.children}">
+                        <ul class="mobile-nav__sub" aria-label="Unterseiten">
+                            <f:for each="{item.children}" as="child">
+                                <li>
+                                    <a href="{child.link}" class="mobile-nav__sub-link">{child.title}</a>
+                                </li>
+                            </f:for>
+                        </ul>
+                    </f:if>
+                </li>
+            </f:for>
+        </ul>
+
+        <address class="mobile-nav__contact" style="font-style:normal;">
+            <a href="tel:{phone -> f:format.replace(search: ' ', replace: '')}">{phone}</a><br>
+            <a href="mailto:{email}">{email}</a>
+        </address>
+    </div>
+</nav>

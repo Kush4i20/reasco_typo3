@@ -1,0 +1,90 @@
+<f:comment>
+    Reasco Site Package – Default Layout
+    Wraps every page. Header + main content + footer.
+    SEO meta is rendered here via page.10 variables.
+</f:comment>
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {f:if(condition: '{page.title}', then: '<title>{page.title} | Reasco Immobilien AG</title>', else: '<title>Reasco Immobilien AG – Wir bringen Ihre Immobilie ans Ziel</title>')}
+
+    {f:if(condition: '{page.description}',
+        then: '<meta name="description" content="{page.description}">',
+        else: '<meta name="description" content="Reasco Immobilien AG – Bauherrenberatung, Architektur, Vermarktung und Energieberatung in der Region Schaffhausen.">'
+    )}
+
+    {f:if(condition: '{page.no_index}', then: '<meta name="robots" content="noindex, nofollow">', else: '<meta name="robots" content="index, follow">')}
+
+    <link rel="canonical" href="{f:uri.page(absolute: 1)}">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="de_CH">
+    <meta property="og:title" content="{page.title} | Reasco Immobilien AG">
+    <meta property="og:description" content="{page.description -> f:format.htmlspecialchars()}">
+    <meta property="og:url" content="{f:uri.page(absolute: 1)}">
+    <meta property="og:site_name" content="Reasco Immobilien AG">
+    {f:if(condition: '{page.og_image}', then: '<meta property="og:image" content="{page.og_image}">')}
+
+    <!-- JSON-LD Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "@id": "https://reasco.immo/#organization",
+        "name": "Reasco Immobilien AG",
+        "url": "https://reasco.immo",
+        "telephone": "+41525510777",
+        "email": "info@reasco.immo",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "SIG Areal, Bau 53, Industrieplatz 1e",
+            "addressLocality": "Neuhausen am Rheinfall",
+            "postalCode": "8212",
+            "addressCountry": "CH"
+        }
+    }
+    </script>
+
+    <!-- CSS & Fonts injected by TypoScript -->
+</head>
+<body class="page page--{page.uid} layout--{page.backend_layout}">
+
+    <!-- ══ HEADER / NAVIGATION ══ -->
+    <header class="site-header" role="banner">
+        <f:render partial="Navigation/Main" arguments="{
+            mainNavigation: mainNavigation,
+            phone: phone,
+            email: email
+        }"/>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <f:render partial="Navigation/Mobile" arguments="{
+        mainNavigation: mainNavigation,
+        phone: phone,
+        email: email
+    }"/>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <main id="main-content" role="main" tabindex="-1">
+        <f:render section="content"/>
+    </main>
+
+    <!-- ══ FOOTER ══ -->
+    <f:render partial="Footer/Footer" arguments="{
+        phone: phone,
+        email: email,
+        emailSales: emailSales,
+        address: address,
+        linkedIn: linkedIn,
+        facebook: facebook,
+        instagram: instagram
+    }"/>
+
+    <!-- JS injected by TypoScript -->
+</body>
+</html>

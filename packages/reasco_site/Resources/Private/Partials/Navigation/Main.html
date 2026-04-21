@@ -1,0 +1,56 @@
+<f:comment>Partial: Main Navigation – dynamisch aus TYPO3 Seitenbaum</f:comment>
+<nav class="site-nav" aria-label="Hauptnavigation">
+    <div class="container">
+        <div class="site-nav__inner">
+
+            <!-- Logo -->
+            <a href="{f:uri.page(pageUid: 1)}" class="site-nav__logo" aria-label="Reasco Immobilien AG – Startseite">
+                <img src="{f:uri.resource(path: 'Images/logo.svg', extensionName: 'reasco_site')}"
+                     alt="Reasco Immobilien AG"
+                     width="160"
+                     height="30"
+                     loading="eager">
+            </a>
+
+            <!-- Desktop Navigation -->
+            <ul class="site-nav__links" role="list">
+                <f:for each="{mainNavigation}" as="item">
+                    <li class="site-nav__item{f:if(condition: item.active, then: ' site-nav__item--active')}">
+                        <a href="{item.link}"
+                           class="site-nav__link{f:if(condition: item.active, then: ' site-nav__link--active')}"
+                           {f:if(condition: item.current, then: 'aria-current="page"')}>
+                            {item.title}
+                        </a>
+                        <!-- Dropdown für Unterseiten -->
+                        <f:if condition="{item.children}">
+                            <ul class="site-nav__dropdown" aria-label="Unterseiten von {item.title}">
+                                <f:for each="{item.children}" as="child">
+                                    <li>
+                                        <a href="{child.link}"
+                                           class="site-nav__dropdown-link{f:if(condition: child.active, then: ' site-nav__dropdown-link--active')}"
+                                           {f:if(condition: child.current, then: 'aria-current="page"')}>
+                                            {child.title}
+                                        </a>
+                                    </li>
+                                </f:for>
+                            </ul>
+                        </f:if>
+                    </li>
+                </f:for>
+            </ul>
+
+            <!-- CTA -->
+            <div class="site-nav__actions">
+                <a href="tel:{phone -> f:format.replace(search: ' ', replace: '')}" class="site-nav__phone" aria-label="Telefon anrufen">{phone}</a>
+                <a href="mailto:{email}" class="btn btn--primary btn--sm">Kontakt</a>
+            </div>
+
+            <!-- Hamburger -->
+            <button class="site-nav__hamburger" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="mobile-nav">
+                <span class="hamburger__line"></span>
+                <span class="hamburger__line"></span>
+                <span class="hamburger__line"></span>
+            </button>
+        </div>
+    </div>
+</nav>

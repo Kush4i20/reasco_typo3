@@ -1,0 +1,18 @@
+<f:comment>Partial: CTA Section – wiederverwendbarer Call-to-Action Block</f:comment>
+<section class="cta-section" aria-labelledby="cta-{f:math.calculate(a: page.uid, b: 1, operation: 'add')}">
+    <div class="container">
+        <f:if condition="{label}">
+            <span class="label label--light reveal">{label}</span>
+        </f:if>
+        <h2 class="cta-section__heading reveal" id="cta-{page.uid}">{heading}</h2>
+        <p class="cta-section__text reveal">{text}</p>
+        <div class="btn-group btn-group--center reveal">
+            <f:if condition="{btnPrimary}">
+                <a href="{btnPrimaryHref}" class="btn btn--brand btn--lg">{btnPrimary}</a>
+            </f:if>
+            <f:if condition="{btnSecondary}">
+                <a href="{btnSecondaryHref}" class="btn btn--outline-white btn--lg">{btnSecondary}</a>
+            </f:if>
+        </div>
+    </div>
+</section>

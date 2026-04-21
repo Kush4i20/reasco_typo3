@@ -1,0 +1,111 @@
+<f:layout name="Default"/>
+<f:comment>
+    Template: Startseite (Backend Layout 1)
+    colPos: 10 Hero | 20 Leistungen | 30 Über uns Strip | 40 Testimonials | 50 Referenzen | 60 CTA | 70 Kontakt
+</f:comment>
+
+<f:section name="content">
+
+    <!-- ── Hero ─────────────────────────────────────── -->
+    <f:render partial="Hero/Home" arguments="{page: page}"/>
+
+    <!-- ── Partners / Mitgliedschaften Strip ───────── -->
+    <div class="partners-strip" aria-label="Mitgliedschaften">
+        <div class="container">
+            <div class="partners__inner">
+                <span class="partners__label">Mitglied bei</span>
+                <span class="partner-badge">SIA</span>
+                <span class="partner-badge">RICS</span>
+                <span class="partner-badge">SVIT</span>
+                <span class="partner-badge">Bauen digital Schweiz</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Leistungen (colPos 20) ───────────────────── -->
+    <section class="section section--white" id="leistungen" aria-labelledby="services-heading">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="label">Unsere Leistungen</span>
+                <h2 id="services-heading">Alles aus einer Hand –<br>von der Idee bis zur Übergabe.</h2>
+                <p class="lead">Fünf Kernkompetenzen, die sich ergänzen und Synergien schaffen.</p>
+            </div>
+            <f:render partial="Content/ServiceCards" arguments="{}"/>
+        </div>
+    </section>
+
+    <!-- ── Dynamische Inhalte colPos 20 ─────────────── -->
+    <f:if condition="{f:cObject(typoscriptObjectPath: 'lib.contentColRight')}">
+        <section class="section">
+            <div class="container">
+                <f:cObject typoscriptObjectPath="lib.contentColRight"/>
+            </div>
+        </section>
+    </f:if>
+
+    <!-- ── Über uns Strip (colPos 30) ───────────────── -->
+    <f:render partial="Content/AboutStrip" arguments="{}"/>
+
+    <!-- ── Dynamische Inhalte colPos 30 ─────────────── -->
+    <f:cObject typoscriptObjectPath="lib.contentColSidebar"/>
+
+    <!-- ── Testimonials (colPos 40) ─────────────────── -->
+    <section class="section section--white" aria-labelledby="testimonials-heading">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="label">Kundenstimmen</span>
+                <h2 id="testimonials-heading">Was unsere Kunden sagen.</h2>
+            </div>
+            <f:render partial="Content/Testimonials" arguments="{}"/>
+        </div>
+    </section>
+
+    <!-- ── Referenzen (colPos 50) ────────────────────── -->
+    <section class="section" aria-labelledby="refs-heading">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="label">Referenzprojekte</span>
+                <h2 id="refs-heading">Ausgewählte Projekte.</h2>
+                <p>Einblicke in realisierte Projekte aus unseren Kernbereichen.</p>
+            </div>
+            <f:render partial="Content/References" arguments="{}"/>
+        </div>
+    </section>
+
+    <!-- ── CTA (colPos 60) ──────────────────────────── -->
+    <f:render partial="Components/CTA" arguments="{
+        label: 'Jetzt starten',
+        heading: 'Haben Sie ein Immobilienprojekt?',
+        text: 'Kontaktieren Sie uns für ein unverbindliches Erstgespräch. Wir beraten Sie kompetent und persönlich.',
+        btnPrimary: 'E-Mail schreiben',
+        btnPrimaryHref: 'mailto:{email}',
+        btnSecondary: phone,
+        btnSecondaryHref: 'tel:+41525510777'
+    }"/>
+
+    <!-- ── Kontaktformular (colPos 70) ──────────────── -->
+    <section class="section section--light" id="kontakt" aria-labelledby="contact-heading">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="label">Kontakt</span>
+                <h2 id="contact-heading">Sprechen Sie mit uns.</h2>
+            </div>
+            <f:render partial="Content/ContactForm" arguments="{
+                phone: phone,
+                email: email,
+                emailSales: emailSales,
+                address: address
+            }"/>
+        </div>
+    </section>
+
+    <!-- ── Dynamische Seiteninhalte (colPos 0) ───────── -->
+    <f:if condition="{f:cObject(typoscriptObjectPath: 'lib.content')}">
+        <section class="section">
+            <div class="container">
+                <f:cObject typoscriptObjectPath="lib.content"/>
+            </div>
+        </section>
+    </f:if>
+
+</f:section>

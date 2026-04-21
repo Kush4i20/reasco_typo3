@@ -1,0 +1,94 @@
+# ============================================================
+# Backend Layouts for TYPO3 Backend
+# ============================================================
+
+# Layout 1: Homepage (Full width, multi-section)
+mod.web_layout.BackendLayouts {
+    pagelayout-1 {
+        title = Startseite
+        config {
+            backend_layout {
+                colCount = 1
+                rowCount = 8
+                rows {
+                    1.columns.1 { name = Hero Bereich; colPos = 10; }
+                    2.columns.1 { name = Leistungen; colPos = 20; }
+                    3.columns.1 { name = Über uns Strip; colPos = 30; }
+                    4.columns.1 { name = Testimonials; colPos = 40; }
+                    5.columns.1 { name = Referenzen; colPos = 50; }
+                    6.columns.1 { name = CTA Bereich; colPos = 60; }
+                    7.columns.1 { name = Kontakt; colPos = 70; }
+                    8.columns.1 { name = Footer Extra; colPos = 80; }
+                }
+            }
+        }
+    }
+
+    # Layout 2: Service page (Intro, Detail, Process, Team, FAQ, CTA)
+    pagelayout-2 {
+        title = Leistungsseite
+        config {
+            backend_layout {
+                colCount = 2
+                rowCount = 7
+                rows {
+                    1 {
+                        columns {
+                            1 { name = Hero / Intro; colPos = 10; colspan = 2; }
+                        }
+                    }
+                    2 {
+                        columns {
+                            1 { name = Inhalt (links); colPos = 20; }
+                            2 { name = Inhalt (rechts); colPos = 21; }
+                        }
+                    }
+                    3 {
+                        columns {
+                            1 { name = Leistungsdetails; colPos = 30; colspan = 2; }
+                        }
+                    }
+                    4 {
+                        columns {
+                            1 { name = Prozess / Schritte; colPos = 40; colspan = 2; }
+                        }
+                    }
+                    5 {
+                        columns {
+                            1 { name = Referenzen; colPos = 50; colspan = 2; }
+                        }
+                    }
+                    6 {
+                        columns {
+                            1 { name = Team / Kontakt; colPos = 60; colspan = 2; }
+                        }
+                    }
+                    7 {
+                        columns {
+                            1 { name = FAQ; colPos = 70; colspan = 2; }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Layout 3: Über uns
+    pagelayout-3 {
+        title = Über uns
+        config {
+            backend_layout {
+                colCount = 1
+                rowCount = 6
+                rows {
+                    1.columns.1 { name = Hero; colPos = 10; }
+                    2.columns.1 { name = Geschichte; colPos = 20; }
+                    3.columns.1 { name = Werte; colPos = 30; }
+                    4.columns.1 { name = Team; colPos = 40; }
+                    5.columns.1 { name = Mitgliedschaften; colPos = 50; }
+                    6.columns.1 { name = Karriere; colPos = 60; }
+                }
+            }
+        }
+    }
+}

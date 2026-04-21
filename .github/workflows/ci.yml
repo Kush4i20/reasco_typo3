@@ -1,0 +1,201 @@
+name: Preview Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-preview:
+    name: Build static HTML preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── Build a static preview from Fluid partials/templates ────────────
+      # Since we have no full TYPO3 instance in CI, we generate a lightweight
+      # static HTML preview that wires in the real CSS/JS/images so the design
+      # can be reviewed on GitHub Pages without installing TYPO3.
+      - name: Generate static preview
+        run: |
+          mkdir -p dist/assets/css dist/assets/js dist/assets/images
+
+          # Copy compiled assets
+          cp packages/reasco_site/Resources/Public/Css/styles.css dist/assets/css/
+          cp packages/reasco_site/Resources/Public/Js/scripts.js  dist/assets/js/
+
+          # Copy images (convert WebP/JPEG as-is; no processing needed for preview)
+          cp packages/reasco_site/Resources/Public/Images/*.svg   dist/assets/images/ 2>/dev/null || true
+          cp packages/reasco_site/Resources/Public/Images/*.webp  dist/assets/images/ 2>/dev/null || true
+          cp packages/reasco_site/Resources/Public/Images/*.jpg   dist/assets/images/ 2>/dev/null || true
+          cp packages/reasco_site/Resources/Public/Images/*.jpeg  dist/assets/images/ 2>/dev/null || true
+          cp packages/reasco_site/Resources/Public/Images/*.png   dist/assets/images/ 2>/dev/null || true
+
+          # Strip TYPO3-specific Fluid syntax (viewhelpers + comments) from
+          # HTML partials so browsers can render a close approximation.
+          node - <<'EOF'
+          const fs   = require('fs');
+          const path = require('path');
+
+          const BASE  = 'packages/reasco_site/Resources/Private';
+          const DIST  = 'dist';
+          const ASSET = '../assets';   // relative from dist pages
+
+          function stripFluid(src) {
+            return src
+              // Remove Fluid comments
+              .replace(/<f:comment>[\s\S]*?<\/f:comment>/g, '')
+              // Resolve common f:if (keep inner content, drop tags)
+              .replace(/<f:if[^>]*>([\s\S]*?)<\/f:if>/g, '$1')
+              // Remove remaining f:* tags (self-closing or paired)
+              .replace(/<f:[^>]*\/>/g, '')
+              .replace(/<\/?f:[^>]*>/g, '')
+              // Replace resource URIs with relative path
+              .replace(/\{f:uri\.resource\(path:\s*'([^']+)',\s*extensionName:\s*'[^']+'\)\}/g,
+                `${ASSET}/images/$1`.replace('Images/', ''))
+              // Replace page URIs with #
+              .replace(/\{f:uri\.page\([^)]*\)\}/g, '#')
+              // Replace simple Fluid vars with placeholder text
+              .replace(/\{page\.title\}/g, 'Reasco Immobilien AG')
+              .replace(/\{page\.subtitle\}/g, '')
+              .replace(/\{page\.description\}/g, '')
+              .replace(/\{siteName\}/g, 'Reasco Immobilien AG')
+              .replace(/\{phone\}/g, '+41 52 551 07 77')
+              .replace(/\{email\}/g, 'info@reasco.immo')
+              .replace(/\{emailSales\}/g, 'vermarktung@reasco.immo')
+              .replace(/\{linkedIn\}/g,  'https://www.linkedin.com')
+              .replace(/\{facebook\}/g,  'https://www.facebook.com')
+              .replace(/\{instagram\}/g, 'https://www.instagram.com')
+              // Remove remaining unresolved Fluid vars/expressions
+              .replace(/\{[^}]{1,80}\}/g, '')
+              // Remove ##UID## placeholders in href
+              .replace(/href="[^"]*##[^"]*##[^"]*"/g, 'href="#"')
+              // Image paths: remove 'Images/' prefix after our replacement
+              .replace(/assets\/images\/Images\//g, 'assets/images/');
+          }
+
+          function collectPartials(dir, map = {}) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                collectPartials(full, map);
+              } else if (entry.name.endsWith('.html')) {
+                const key = path.relative(path.join(BASE, 'Partials'), full)
+                  .replace(/\\/g, '/').replace('.html', '');
+                map[key] = fs.readFileSync(full, 'utf8');
+              }
+            }
+            return map;
+          }
+
+          const partials = collectPartials(path.join(BASE, 'Partials'));
+
+          function inlinePartials(html, depth = 0) {
+            if (depth > 5) return html;
+            return html.replace(
+              /<f:render\s+partial="([^"]+)"[^/]*(\/?>|>[\s\S]*?<\/f:render>)/g,
+              (_, name) => {
+                const src = partials[name] || partials[name.replace(/\//g, '_')] || '';
+                return src ? inlinePartials(src, depth + 1) : '';
+              }
+            );
+          }
+
+          const layoutSrc = fs.readFileSync(
+            path.join(BASE, 'Layouts/Default.html'), 'utf8'
+          );
+
+          const pages = [
+            { tpl: 'Page/Default',  out: 'index.html',           title: 'Startseite' },
+            { tpl: 'Page/Service',  out: 'leistungen/index.html', title: 'Leistungen' },
+            { tpl: 'Page/About',    out: 'ueber-uns/index.html',  title: 'Über uns'   },
+          ];
+
+          for (const page of pages) {
+            const tplSrc  = fs.readFileSync(
+              path.join(BASE, 'Templates', `${page.tpl}.html`), 'utf8'
+            );
+
+            // Extract sections from template
+            const sections = {};
+            for (const m of tplSrc.matchAll(/<f:section\s+name="([^"]+)">([\s\S]*?)<\/f:section>/g)) {
+              sections[m[1]] = m[2];
+            }
+            const contentHtml = sections['content'] || tplSrc;
+
+            // Build full page by inserting content into layout
+            let full = layoutSrc
+              .replace(/<f:render\s+section="content"[^/]*\/>/g, contentHtml)
+              .replace(/<f:render\s+section="content"[^>]*>[\s\S]*?<\/f:render>/g, contentHtml);
+
+            full = inlinePartials(full);
+            full = stripFluid(full);
+
+            // Fix asset paths relative to nested pages
+            const depth = page.out.split('/').length - 1;
+            const prefix = depth > 0 ? '../'.repeat(depth) : './';
+            full = full
+              .replace(/assets\/css\//g,    `${prefix}assets/css/`)
+              .replace(/assets\/js\//g,     `${prefix}assets/js/`)
+              .replace(/assets\/images\//g, `${prefix}assets/images/`)
+              .replace(/href="\/"/g,        `href="${prefix}index.html"`);
+
+            // Inject real <title> and minimal head if missing
+            full = full
+              .replace(/<title>[^<]*<\/title>/, `<title>${page.title} – Reasco Immobilien AG</title>`)
+              .replace('</head>',
+                `  <link rel="stylesheet" href="${prefix}assets/css/styles.css">\n</head>`)
+              .replace('</body>',
+                `  <script src="${prefix}assets/js/scripts.js"></script>\n</body>`);
+
+            const outPath = path.join(DIST, page.out);
+            fs.mkdirSync(path.dirname(outPath), { recursive: true });
+            fs.writeFileSync(outPath, full, 'utf8');
+            console.log('Written:', outPath);
+          }
+          EOF
+
+      # ── Lint CSS ──────────────────────────────────────────────────────────
+      - name: Check CSS syntax
+        run: |
+          if command -v npx &>/dev/null; then
+            npx --yes stylelint \
+              "packages/reasco_site/Resources/Public/Css/styles.css" \
+              --config '{"rules":{"no-duplicate-selectors":true}}' \
+              || echo "stylelint warnings (non-blocking)"
+          fi
+
+      # ── Upload pages artifact ─────────────────────────────────────────────
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build-preview
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

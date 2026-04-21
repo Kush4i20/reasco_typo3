@@ -1,0 +1,25 @@
+# ============================================================
+# Reasco Site Package – TypoScript Constants
+# ============================================================
+
+# Base path for extension resources
+reasco {
+    resourcePath = EXT:reasco_site/Resources/Public
+    privatePath  = EXT:reasco_site/Resources/Private
+}
+
+# Site settings (override in site-specific TypoScript)
+plugin.tx_reasco {
+    settings {
+        siteName     = Reasco Immobilien AG
+        siteTagline  = Wir bringen Ihre Immobilie ans Ziel.
+        phone        = +41 52 551 07 77
+        email        = info@reasco.immo
+        emailSales   = vermarktung@reasco.immo
+        address      = SIG Areal, Bau 53, Industrieplatz 1e, CH-8212 Neuhausen am Rheinfall
+        linkedIn     = https://www.linkedin.com/company/reasco-immobilien-ag
+        facebook     = https://www.facebook.com/reasco.immo
+        instagram    = https://www.instagram.com/reasco.immo
+        youtube      = https://www.youtube.com/@reasco.immo
+    }
+}

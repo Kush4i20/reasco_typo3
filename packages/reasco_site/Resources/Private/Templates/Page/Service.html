@@ -1,0 +1,107 @@
+<f:layout name="Default"/>
+<f:comment>
+    Template: Leistungsseite (Backend Layout 2)
+    Verwendet für: Bauherrenberatung, Architektur, GU-Mandate, Vermarktung, Energie
+    colPos: 10 Hero | 20/21 Intro Split | 30 Leistungsdetails | 40 Prozess | 50 Referenzen | 60 Team | 70 FAQ
+</f:comment>
+
+<f:section name="content">
+
+    <!-- ── Hero (colPos 10) ─────────────────────────── -->
+    <f:render partial="Hero/SubPage" arguments="{page: page}"/>
+
+    <!-- ── Intro / Beschreibung (colPos 20 & 21) ─────── -->
+    <section class="section section--white" aria-labelledby="service-intro-heading">
+        <div class="container">
+            <div class="split split--center">
+                <div class="reveal">
+                    <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                        <f:defaultCase>
+                            <f:variable name="colPos">20</f:variable>
+                        </f:defaultCase>
+                    </f:cObject>
+                    <f:if condition="!{colPos20}">
+                        <p class="lead" style="color:var(--text-muted);">Inhalt über das TYPO3 Backend in Spalte «Inhalt (links)» pflegen.</p>
+                    </f:if>
+                </div>
+                <div class="reveal reveal-delay-2">
+                    <f:cObject typoscriptObjectPath="lib.contentColRight"/>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Leistungsdetails (colPos 30) ──────────────── -->
+    <section class="section" aria-labelledby="service-detail-heading">
+        <div class="container">
+            <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                <f:variable name="colPos">30</f:variable>
+            </f:cObject>
+        </div>
+    </section>
+
+    <!-- ── Prozess / Schritte (colPos 40) ────────────── -->
+    <section class="section section--white" aria-labelledby="process-heading">
+        <div class="container">
+            <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                <f:variable name="colPos">40</f:variable>
+            </f:cObject>
+        </div>
+    </section>
+
+    <!-- ── Referenzen (colPos 50) ────────────────────── -->
+    <section class="section" aria-labelledby="service-refs-heading">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="label">Referenzen</span>
+                <h2 id="service-refs-heading">Ausgewählte Projekte.</h2>
+            </div>
+            <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                <f:variable name="colPos">50</f:variable>
+            </f:cObject>
+        </div>
+    </section>
+
+    <!-- ── Team / Kontakt (colPos 60) ────────────────── -->
+    <section class="section section--light" aria-labelledby="team-contact-heading">
+        <div class="container">
+            <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                <f:variable name="colPos">60</f:variable>
+            </f:cObject>
+        </div>
+    </section>
+
+    <!-- ── FAQ (colPos 70) ──────────────────────────── -->
+    <section class="section section--white" aria-labelledby="faq-heading">
+        <div class="container container--narrow">
+            <div class="section-header reveal">
+                <span class="label">FAQ</span>
+                <h2 id="faq-heading">Häufige Fragen.</h2>
+            </div>
+            <f:cObject typoscriptObjectPath="lib.dynamicContent">
+                <f:variable name="colPos">70</f:variable>
+            </f:cObject>
+        </div>
+    </section>
+
+    <!-- ── CTA ──────────────────────────────────────── -->
+    <f:render partial="Components/CTA" arguments="{
+        label: 'Kontakt aufnehmen',
+        heading: page.subtitle,
+        text: 'Kontaktieren Sie uns für ein unverbindliches Erstgespräch.',
+        btnPrimary: 'Anfrage senden',
+        btnPrimaryHref: 'mailto:{email}',
+        btnSecondary: phone,
+        btnSecondaryHref: 'tel:+41525510777'
+    }"/>
+
+    <!-- ── Freie Inhalte (colPos 0) ─────────────────── -->
+    <f:if condition="{f:cObject(typoscriptObjectPath: 'lib.content')}">
+        <section class="section">
+            <div class="container">
+                <f:cObject typoscriptObjectPath="lib.content"/>
+            </div>
+        </section>
+    </f:if>
+
+</f:section>

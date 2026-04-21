@@ -1,0 +1,61 @@
+<f:comment>Partial: Hero – Startseite (mit Bild, Stats, CTAs)</f:comment>
+<section class="hero hero--home" aria-labelledby="hero-heading">
+    <div class="hero__bg">
+        <img src="{f:uri.resource(path: 'Images/hero-home.webp', extensionName: 'reasco_site')}"
+             alt="Immobilien Schaffhausen – Reasco Immobilien AG"
+             class="hero__bg-image"
+             loading="eager"
+             width="1600"
+             height="900">
+        <div class="hero__bg-overlay" aria-hidden="true"></div>
+    </div>
+
+    <div class="container hero__inner">
+        <div class="hero__content">
+            <div class="hero__eyebrow" aria-hidden="true">
+                <span class="hero__eyebrow-line"></span>
+                Immobilien · Architektur · Energie
+            </div>
+
+            <h1 class="hero__title" id="hero-heading">
+                Wir bringen Ihre<br>
+                <em>Immobilie</em> ans Ziel.
+            </h1>
+
+            <p class="hero__desc">
+                Kompetente Beratung, Planung und Vermarktung für Eigentümer und Investoren
+                in der Region Schaffhausen, Thurgau und Zürich.
+            </p>
+
+            <div class="hero__actions btn-group">
+                <a href="{f:uri.page(pageUid: '{page.uid}', section: 'leistungen')}"
+                   class="btn btn--primary btn--lg">
+                    Unsere Leistungen
+                </a>
+                <a href="{f:uri.page(pageUid: '{page.uid}', section: 'kontakt')}"
+                   class="btn btn--outline-white btn--lg">
+                    Kontakt aufnehmen
+                </a>
+            </div>
+        </div>
+
+        <div class="hero__stats" aria-label="Kennzahlen">
+            <div class="hero__stat">
+                <div class="hero__stat-num">20+</div>
+                <div class="hero__stat-label">Fachleute im Team</div>
+            </div>
+            <div class="hero__stat">
+                <div class="hero__stat-num">30+</div>
+                <div class="hero__stat-label">Erfolgreich vermarktete Objekte</div>
+            </div>
+            <div class="hero__stat">
+                <div class="hero__stat-num">2003</div>
+                <div class="hero__stat-label">Gegründet, Wurzeln in der SIG</div>
+            </div>
+            <div class="hero__stat">
+                <div class="hero__stat-num">5</div>
+                <div class="hero__stat-label">Kernleistungen aus einer Hand</div>
+            </div>
+        </div>
+    </div>
+</section>

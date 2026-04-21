@@ -1,0 +1,23 @@
+<f:comment>Partial: Hero – Unterseiten (dunkler Header mit Breadcrumb + H1)</f:comment>
+<section class="hero hero--sub" aria-labelledby="page-heading">
+    <div class="container">
+
+        <!-- Breadcrumb (aus TypoScript lib.breadcrumb) -->
+        <nav aria-label="Breadcrumb" class="hero__breadcrumb">
+            <f:cObject typoscriptObjectPath="lib.breadcrumb"/>
+        </nav>
+
+        <!-- Page Label (aus Seiteneigenschaften: Subtitle oder Kategorie) -->
+        <f:if condition="{page.subtitle}">
+            <span class="label label--light">{page.subtitle}</span>
+        </f:if>
+
+        <h1 class="hero__title hero__title--sub" id="page-heading">
+            {page.title}
+        </h1>
+
+        <f:if condition="{page.description}">
+            <p class="hero__desc">{page.description}</p>
+        </f:if>
+    </div>
+</section>

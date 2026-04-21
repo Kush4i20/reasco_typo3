@@ -1,0 +1,199 @@
+# ============================================================
+# Reasco Site Package – TypoScript Setup
+# ============================================================
+
+# ── Page configuration ──────────────────────────────────────
+page = PAGE
+page {
+    typeNum = 0
+    shortcutIcon = EXT:reasco_site/Resources/Public/Images/favicon.ico
+
+    # CSS
+    includeCSS {
+        googleFonts = https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Playfair+Display:wght@400;600&display=swap
+        googleFonts.external = 1
+        main = EXT:reasco_site/Resources/Public/Css/styles.css
+    }
+
+    # JavaScript
+    includeJSFooter {
+        main = EXT:reasco_site/Resources/Public/Js/scripts.js
+        main.defer = 1
+    }
+
+    # HTML meta
+    meta {
+        viewport = width=device-width, initial-scale=1.0
+        robots = index, follow
+        charset = UTF-8
+    }
+
+    # Fluid template rendering
+    10 = FLUIDTEMPLATE
+    10 {
+        templateRootPaths {
+            0 = EXT:reasco_site/Resources/Private/Templates/
+            1 = {$reasco.privatePath}/Templates/
+        }
+        partialRootPaths {
+            0 = EXT:reasco_site/Resources/Private/Partials/
+            1 = {$reasco.privatePath}/Partials/
+        }
+        layoutRootPaths {
+            0 = EXT:reasco_site/Resources/Private/Layouts/
+            1 = {$reasco.privatePath}/Layouts/
+        }
+
+        # Select template based on backend layout
+        templateName = TEXT
+        templateName.cObject = CASE
+        templateName.cObject {
+            key.data = pagelayout
+            default = TEXT
+            default.value = Page/Default
+            pagelayout-1 = TEXT
+            pagelayout-1.value = Page/Default
+            pagelayout-2 = TEXT
+            pagelayout-2.value = Page/Service
+            pagelayout-3 = TEXT
+            pagelayout-3.value = Page/About
+        }
+
+        # Pass variables to all templates
+        variables {
+            siteName = TEXT
+            siteName.value = {$plugin.tx_reasco.settings.siteName}
+
+            phone = TEXT
+            phone.value = {$plugin.tx_reasco.settings.phone}
+
+            email = TEXT
+            email.value = {$plugin.tx_reasco.settings.email}
+
+            emailSales = TEXT
+            emailSales.value = {$plugin.tx_reasco.settings.emailSales}
+
+            address = TEXT
+            address.value = {$plugin.tx_reasco.settings.address}
+
+            linkedIn = TEXT
+            linkedIn.value = {$plugin.tx_reasco.settings.linkedIn}
+
+            facebook = TEXT
+            facebook.value = {$plugin.tx_reasco.settings.facebook}
+
+            instagram = TEXT
+            instagram.value = {$plugin.tx_reasco.settings.instagram}
+        }
+
+        # Open Graph / SEO meta from page properties
+        dataProcessing {
+            10 = TYPO3\CMS\Frontend\DataProcessing\MenuProcessor
+            10 {
+                levels = 2
+                expandAll = 1
+                includeSpacer = 1
+                as = mainNavigation
+            }
+        }
+    }
+}
+
+# ── Content rendering ────────────────────────────────────────
+lib.dynamicContent = COA
+lib.dynamicContent {
+    10 = LOAD_REGISTER
+    10.colPos.cObject = TEXT
+    10.colPos.cObject.data = register:colPos
+    10.colPos.cObject.ifEmpty = 0
+
+    20 = CONTENT
+    20 {
+        table = tt_content
+        select {
+            orderBy = sorting
+            where = {#colPos}={register:colPos}
+            languageField = sys_language_uid
+        }
+    }
+
+    99 = RESTORE_REGISTER
+}
+
+# Shorthand for each column
+lib.content = COA
+lib.content {
+    10 < lib.dynamicContent
+    10.10.10.value = 0
+}
+
+lib.contentColRight = COA
+lib.contentColRight {
+    10 < lib.dynamicContent
+    10.10.10.value = 1
+}
+
+lib.contentColSidebar = COA
+lib.contentColSidebar {
+    10 < lib.dynamicContent
+    10.10.10.value = 2
+}
+
+# ── Navigation ───────────────────────────────────────────────
+lib.mainNav = HMENU
+lib.mainNav {
+    1 = TMENU
+    1 {
+        NO {
+            wrapItemAndSub = <li class="nav__item">|</li>
+            ATagParams = class="nav__link"
+            stdWrap.htmlSpecialChars = 1
+        }
+        ACT = 1
+        ACT {
+            wrapItemAndSub = <li class="nav__item nav__item--active">|</li>
+            ATagParams = class="nav__link nav__link--active"
+        }
+        CUR = 1
+        CUR {
+            wrapItemAndSub = <li class="nav__item nav__item--current">|</li>
+            ATagParams = class="nav__link nav__link--current"
+        }
+    }
+}
+
+# ── Breadcrumb ────────────────────────────────────────────────
+lib.breadcrumb = HMENU
+lib.breadcrumb {
+    special = rootline
+    special.range = 0|-1
+    1 = TMENU
+    1 {
+        NO {
+            stdWrap.htmlSpecialChars = 1
+            ATagParams = class="breadcrumb__link"
+            wrapItemAndSub = <li class="breadcrumb__item">|</li>
+        }
+        CUR = 1
+        CUR {
+            doNotLinkIt = 1
+            wrapItemAndSub = <li class="breadcrumb__item breadcrumb__item--current" aria-current="page">|</li>
+        }
+    }
+    wrap = <ol class="breadcrumb">|</ol>
+}
+
+# ── Image rendering ───────────────────────────────────────────
+tt_content.image.20.1.file.maxW = 1200
+tt_content.image.20.1.file.maxH = 800
+
+# ── SEO: hreflang / canonical ─────────────────────────────────
+config {
+    metaCharset = utf-8
+    htmlTag_langKey = de
+    htmlTag_setParams = lang="de-CH"
+    absRefPrefix = auto
+    uniqueLinkVars = 1
+    no_cache = 0
+    sendCacheHeaders = 1
+}
