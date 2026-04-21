@@ -55,6 +55,13 @@ jobs:
           const DIST  = 'dist';
           const ASSET = '../assets';   // relative from dist pages
 
+          function applyPageVars(src, page) {
+            return src
+              .replace(/\{page\.title\}/g, page.pageTitle || page.title || 'Reasco Immobilien AG')
+              .replace(/\{page\.subtitle\}/g, page.subtitle || '')
+              .replace(/\{page\.description\}/g, page.description || '');
+          }
+
           function stripFluid(src) {
             return src
               // Remove Fluid comments
@@ -70,9 +77,6 @@ jobs:
               // Replace page URIs with #
               .replace(/\{f:uri\.page\([^)]*\)\}/g, '#')
               // Replace simple Fluid vars with placeholder text
-              .replace(/\{page\.title\}/g, 'Reasco Immobilien AG')
-              .replace(/\{page\.subtitle\}/g, '')
-              .replace(/\{page\.description\}/g, '')
               .replace(/\{siteName\}/g, 'Reasco Immobilien AG')
               .replace(/\{phone\}/g, '+41 52 551 07 77')
               .replace(/\{email\}/g, 'info@reasco.immo')
@@ -120,9 +124,62 @@ jobs:
           );
 
           const pages = [
-            { tpl: 'Page/Default',  out: 'index.html',           title: 'Startseite' },
-            { tpl: 'Page/Service',  out: 'leistungen/index.html', title: 'Leistungen' },
-            { tpl: 'Page/About',    out: 'ueber-uns/index.html',  title: 'Über uns'   },
+            {
+              tpl: 'Page/Default',
+              out: 'index.html',
+              title: 'Startseite',
+              pageTitle: 'Reasco Immobilien AG',
+              subtitle: 'Immobilienkompetenz in Schaffhausen',
+              description: 'Reasco Immobilien AG – Bauherrenberatung, Architektur, GU-Mandate, Vermarktung und Energieberatung in der Region Schaffhausen.'
+            },
+            {
+              tpl: 'Page/Service',
+              out: 'bauherrenberatung/index.html',
+              title: 'Bauherrenberatung',
+              pageTitle: 'Bauherrenberatung',
+              subtitle: 'Leistung',
+              description: 'Strategische und technische Bauherrenberatung von der Projektidee bis zur Realisierung.'
+            },
+            {
+              tpl: 'Page/Service',
+              out: 'architektur-bauleitung/index.html',
+              title: 'Architektur und Bauleitung',
+              pageTitle: 'Architektur und Bauleitung',
+              subtitle: 'Leistung',
+              description: 'Planung, Projektierung und Bauleitung für anspruchsvolle Immobilienprojekte.'
+            },
+            {
+              tpl: 'Page/Service',
+              out: 'generalunternehmer-mandate/index.html',
+              title: 'GU-Mandate',
+              pageTitle: 'Generalunternehmer-Mandate',
+              subtitle: 'Leistung',
+              description: 'Begleitung und Steuerung von GU-Mandaten mit Fokus auf Qualität, Kosten und Termine.'
+            },
+            {
+              tpl: 'Page/Service',
+              out: 'vermarktung/index.html',
+              title: 'Vermarktung',
+              pageTitle: 'Immobilienvermarktung',
+              subtitle: 'Leistung',
+              description: 'Professionelle Vermarktung von Wohn- und Anlageimmobilien mit regionaler Marktkenntnis.'
+            },
+            {
+              tpl: 'Page/Service',
+              out: 'energieberatung/index.html',
+              title: 'Energieberatung',
+              pageTitle: 'Energieberatung',
+              subtitle: 'Leistung',
+              description: 'Energieeffiziente Sanierungs- und Neubaukonzepte mit Blick auf Nachhaltigkeit und Wirtschaftlichkeit.'
+            },
+            {
+              tpl: 'Page/About',
+              out: 'ueber-uns/index.html',
+              title: 'Über uns',
+              pageTitle: 'Über uns',
+              subtitle: 'Reasco Immobilien AG',
+              description: 'Das Team, die Werte und die Arbeitsweise von Reasco Immobilien AG.'
+            },
           ];
 
           for (const page of pages) {
@@ -142,6 +199,7 @@ jobs:
               .replace(/<f:render\s+section="content"[^/]*\/>/g, contentHtml)
               .replace(/<f:render\s+section="content"[^>]*>[\s\S]*?<\/f:render>/g, contentHtml);
 
+            full = applyPageVars(full, page);
             full = inlinePartials(full);
             full = stripFluid(full);
 
@@ -169,12 +227,6 @@ jobs:
           }
           EOF
 
-          # Include pre-built static pages created outside TYPO3 templates.
-          if [ -d preview-static ]; then
-            mkdir -p dist/static
-            cp -R preview-static/. dist/static/
-          fi
-
           # Add a small index for easier manual QA in GitHub Pages.
           cat > dist/preview-hub.html <<'HTML'
           <!doctype html>
@@ -193,8 +245,13 @@ jobs:
           <body>
             <h1>Reasco Preview Hub</h1>
             <ul>
-              <li><a href="./index.html">TYPO3 Preview (generated)</a></li>
-              <li><a href="./static/index.html">Static Pages Preview (Claude build)</a></li>
+              <li><a href="./index.html">Startseite</a></li>
+              <li><a href="./bauherrenberatung/index.html">Bauherrenberatung</a></li>
+              <li><a href="./architektur-bauleitung/index.html">Architektur und Bauleitung</a></li>
+              <li><a href="./generalunternehmer-mandate/index.html">GU-Mandate</a></li>
+              <li><a href="./vermarktung/index.html">Vermarktung</a></li>
+              <li><a href="./energieberatung/index.html">Energieberatung</a></li>
+              <li><a href="./ueber-uns/index.html">Über uns</a></li>
             </ul>
           </body>
           </html>
