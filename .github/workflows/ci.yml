@@ -358,9 +358,19 @@ jobs:
       # ── Lint CSS ──────────────────────────────────────────────────────────
       - name: Check CSS syntax
         run: |
+          cat > .stylelint-ci.json <<'JSON'
+          {
+            "rules": {
+              "no-duplicate-selectors": true,
+              "block-no-empty": true,
+              "color-no-invalid-hex": true
+            }
+          }
+          JSON
+
           npx --yes stylelint \
             "packages/reasco_site/Resources/Public/Css/styles.css" \
-            --config '{"rules":{"no-duplicate-selectors":true,"block-no-empty":true,"color-no-invalid-hex":true}}'
+            --config .stylelint-ci.json
 
       # ── Upload pages artifact ─────────────────────────────────────────────
       - name: Upload Pages artifact
