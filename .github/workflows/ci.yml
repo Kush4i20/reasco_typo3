@@ -205,6 +205,8 @@ jobs:
             },
           ];
 
+          const baseUrl = 'https://kush4i20.github.io/reasco_typo3';
+
           for (const page of pages) {
             const tplSrc  = fs.readFileSync(
               path.join(BASE, 'Templates', `${page.tpl}.html`), 'utf8'
@@ -258,7 +260,6 @@ jobs:
             console.log('Written:', outPath);
           }
 
-          const baseUrl = 'https://kush4i20.github.io/reasco_typo3';
           const sitemapUrls = pages.map((p) => `${baseUrl}/${p.out.replace(/index\.html$/, '')}`);
           const sitemapXml =
             '<?xml version="1.0" encoding="UTF-8"?>\n' +
