@@ -230,11 +230,19 @@ jobs:
             // Fix asset paths relative to nested pages
             const depth = page.out.split('/').length - 1;
             const prefix = depth > 0 ? '../'.repeat(depth) : './';
+            const pageUrl = `${baseUrl}/${page.out.replace(/index\.html$/, '')}`;
             full = full
               .replace(/assets\/css\//g,    `${prefix}assets/css/`)
               .replace(/assets\/js\//g,     `${prefix}assets/js/`)
               .replace(/assets\/images\//g, `${prefix}assets/images/`)
               .replace(/href="\/"/g,        `href="${prefix}index.html"`);
+
+            // Ensure absolute SEO URLs in preview output.
+            full = full
+              .replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>(?![\s\S]*<link\s+rel="canonical")/i,
+                `<link rel="canonical" href="${pageUrl}">`)
+              .replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>(?![\s\S]*<meta\s+property="og:url")/i,
+                `<meta property="og:url" content="${pageUrl}">`);
 
             // Inject real <title> and minimal head if missing
             full = full

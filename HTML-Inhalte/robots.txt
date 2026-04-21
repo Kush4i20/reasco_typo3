@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://reasco.immo/sitemap.xml
+
+# Block irrelevant paths
+Disallow: /assets/
+Disallow: /*.json$

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>https://reasco.immo/</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/bauherrenberatung</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/bauherrenberatung"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/architektur-bauleitung</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/architektur-bauleitung"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/generalunternehmer-mandate</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/generalunternehmer-mandate"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/vermarktung</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/vermarktung"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/energieberatung</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/energieberatung"/>
+  </url>
+
+  <url>
+    <loc>https://reasco.immo/ueber-uns</loc>
+    <lastmod>2025-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="de-CH" href="https://reasco.immo/ueber-uns"/>
+  </url>
+
+</urlset>
