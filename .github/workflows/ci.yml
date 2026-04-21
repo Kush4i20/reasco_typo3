@@ -169,6 +169,37 @@ jobs:
           }
           EOF
 
+          # Include pre-built static pages created outside TYPO3 templates.
+          if [ -d preview-static ]; then
+            mkdir -p dist/static
+            cp -R preview-static/. dist/static/
+          fi
+
+          # Add a small index for easier manual QA in GitHub Pages.
+          cat > dist/preview-hub.html <<'HTML'
+          <!doctype html>
+          <html lang="de">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Preview Hub</title>
+            <style>
+              body{font-family:system-ui,-apple-system,sans-serif;margin:2rem;line-height:1.5}
+              h1{margin:0 0 1rem}
+              ul{padding-left:1.25rem}
+              a{color:#0b5cab}
+            </style>
+          </head>
+          <body>
+            <h1>Reasco Preview Hub</h1>
+            <ul>
+              <li><a href="./index.html">TYPO3 Preview (generated)</a></li>
+              <li><a href="./static/index.html">Static Pages Preview (Claude build)</a></li>
+            </ul>
+          </body>
+          </html>
+          HTML
+
       # ── Lint CSS ──────────────────────────────────────────────────────────
       - name: Check CSS syntax
         run: |
