@@ -51,7 +51,7 @@ jobs:
 
           const BASE  = 'packages/reasco_site/Resources/Private';
           const DIST  = 'dist';
-          const ASSET = '../assets';   // relative from dist pages
+          const ASSET = 'assets';
 
           function applyPageVars(src, page) {
             return src
